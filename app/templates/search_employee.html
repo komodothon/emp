@@ -1,0 +1,131 @@
+{% extends "layout.html" %}
+
+{% block title %}
+    Search Employee
+{% endblock %}
+{% block content %}
+    <div class="container-fluid mt-3">
+        <h1>Search Employee</h1>
+        
+        <form id="search-form">
+            <div class="row">
+                <!-- Department Dropdown -->
+                <div class="col-md-4">
+                    <label for="department">Department</label>
+                    <select id="department" class="form-select">
+                        <option value="">Select Department</option>
+                        {% for dept in departments %}
+                            <option value="{{ dept.id }}">{{ dept.name }}</option>
+                        {% endfor %}
+                    </select>
+                </div>
+                
+                <!-- Role Dropdown -->
+                <div class="col-md-4">
+                    <label for="role">Role</label>
+                    <select id="role" class="form-select">
+                        <option value="">Select Role</option>
+                        {% for role in roles %}
+                            <option value="{{ role.id }}">{{ role.name }}</option>
+                        {% endfor %}
+                    </select>
+                </div>
+                
+                <!-- Designation Dropdown -->
+                <div class="col-md-4">
+                    <label for="designation">Designation</label>
+                    <select id="designation" class="form-select">
+                        <option value="">Select Designation</option>
+                        {% for designation in designations %}
+                            <option value="{{ designation.id }}">{{ designation.name }}</option>
+                        {% endfor %}
+                    </select>
+                </div>
+            </div>
+            
+            <div class="row mt-3">
+                <!-- Contract Type Dropdown -->
+                <div class="col-md-4">
+                    <label for="contract_type">Contract Type</label>
+                    <select id="contract_type" class="form-select">
+                        <option value="">Select Contract Type</option>
+                        {% for contract in contract_types %}
+                            <option value="{{ contract.id }}">{{ contract.name }}</option>
+                        {% endfor %}
+                    </select>
+                </div>
+                
+                <!-- Status Dropdown -->
+                <div class="col-md-4">
+                    <label for="status">Status</label>
+                    <select id="status" class="form-select">
+                        <option value="">Select Status</option>
+                        {% for status in statuses %}
+                            <option value="{{ status.id }}">{{ status.name }}</option>
+                        {% endfor %}
+                    </select>
+                </div>               
+
+            </div>
+            <hr>
+            <!-- Employee Name Input -->
+            <div class="col-md-4">
+                <label for="employee_name">Employee Name</label>
+                <input type="text" id="employee_name" class="form-control" placeholder="Search employee...">
+                <ul class="list-group position-absolute w-100" id="search-results" style="z-index: 1000;"></ul>
+            </div>
+        </form>
+    </div>
+    
+    <script>
+        document.getElementById("employee_name").addEventListener("input", function() {
+            let query = this.value.trim();
+            let department = document.getElementById("department").value;
+            let role = document.getElementById("role").value;
+            let designation = document.getElementById("designation").value;
+            let contract_type = document.getElementById("contract_type").value;
+            let status = document.getElementById("status").value;
+
+            console.log("query: " + query)
+            console.log("department: " + department)
+            console.log("role: " + role)
+            console.log("designation: " + designation)
+            console.log("contract_type: " + contract_type)
+            console.log("status: " + status)
+            
+            if (query.length > 2) {
+                let searchParams = new URLSearchParams({
+                    q: query,
+                    department: department,
+                    role: role,
+                    designation: designation,
+                    contract_type: contract_type,
+                    status: status
+                });
+                
+                fetch(`/search_employee?${searchParams}`)
+                .then(response => response.json())
+                .then(data => {
+                    let results = document.getElementById("search-results");
+                    results.innerHTML = "";
+                    if (data.length === 0) {
+                        let li = document.createElement("li");
+                        li.className = "list-group-item text-muted";
+                        li.textContent = "No employees found";
+                        results.appendChild(li);
+                    } else {
+                        data.forEach(emp => {
+                            let li = document.createElement("li");
+                            li.className = "list-group-item list-group-item-action";
+                            li.innerHTML = `<strong>${emp.username}</strong> - ${emp.first_name} ${emp.last_name} | ${emp.email}`;
+                            li.addEventListener("click", () => {
+                                window.location.href = `/view_employee/${emp.id}`;
+                            });
+                            results.appendChild(li);
+                        });
+                    }
+                });
+            }
+        });
+    </script>
+{% endblock %}

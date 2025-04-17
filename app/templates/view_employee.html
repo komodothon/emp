@@ -1,0 +1,71 @@
+{% extends "layout.html" %}
+
+{% block title %}
+    View Employee
+{% endblock %}
+
+{% block content %}
+    <div class="container mt-4">
+        <h2 class="mb-3 text-center">Employee Information</h2>
+
+        {% if employee %}
+            <div class="card shadow-sm mx-auto" style="max-width: 800px;">
+                <div class="card-header bg-dark text-white">
+                    <h5 class="mb-0 text-center text-lg-start">{{ employee.first_name }} {{ employee.last_name }}</h5>
+                </div>
+                <div class="card-body">
+                    <div class="row g-3">
+                        <!-- Left Column -->
+                        <div class="col-lg-6 col-md-12">
+                            <p><strong>Username:</strong> {{ employee.username }}</p>
+                            <p><strong>First Name:</strong> {{ employee.first_name }}</p>
+                            <p><strong>Last Name:</strong> {{ employee.last_name }}</p>
+                            <p><strong>Email:</strong> {{ employee.email }}</p>
+                            <p><strong>Phone:</strong> {{ employee.phone or "N/A" }}</p>
+                            <p><strong>Address:</strong> {{ employee.address or "N/A" }}</p>
+                        </div>
+                        
+                        <!-- Right Column -->
+                        <div class="col-lg-6 col-md-12">
+                            <p><strong>Department:</strong> {{ employee.department.name }}</p>
+                            <p><strong>Role:</strong> {{ employee.role.name }}</p>
+                            <p><strong>Designation:</strong> {{ employee.designation.name }}</p>
+                            <p><strong>Contract Type:</strong> {{ employee.contract_type.name }}</p>
+                            <p><strong>Status:</strong> 
+                                <span class="badge {% if employee.status.name == 'Active' %}bg-success{% else %}bg-danger{% endif %}">
+                                    {{ employee.status.name }}
+                                </span>
+                            </p>
+                        </div>
+                    </div>
+
+                    <hr>
+
+                    <div class="row g-3">
+                        <div class="col-lg-6 col-md-12">
+                            <p><strong>Date of Birth:</strong> {{ employee.date_of_birth.strftime('%d %B %Y') if employee.date_of_birth else "N/A" }}</p>
+                        </div>
+                        <div class="col-lg-6 col-md-12">
+                            <p><strong>Hire Date:</strong> {{ employee.hire_date.strftime('%d %B %Y') }}</p>
+                        </div>
+                    </div>
+
+                    <hr>
+                    <!-- Buttons: Back & Edit -->
+                    <div class="d-flex justify-content-between flex-wrap">
+                        <a href="{{ url_for('main.dashboard') }}" class="btn btn-secondary mb-2">
+                            <i class="fas fa-arrow-left"></i> Back
+                        </a>
+                        <a href="{{ url_for('main.edit_employee', id=employee.id) }}" class="btn btn-warning mb-2">
+                            <i class="fas fa-edit"></i> Edit
+                        </a>
+                    </div>
+                </div>
+            </div>
+        {% else %}
+            <div class="alert alert-warning text-center" role="alert">
+                Employee details not found.
+            </div>
+        {% endif %}
+    </div>
+{% endblock %}

@@ -1,0 +1,11 @@
+version: "3.9"
+
+services:
+  web:
+    build: .
+    container_name: flask_app
+    ports:
+      - "8000:8000"        # Maps container's port 8000 to your host
+    volumes:
+      - .:/app             # Mounts your code (including the SQLite DB) into the container
+    restart: always

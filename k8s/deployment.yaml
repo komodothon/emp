@@ -1,0 +1,24 @@
+# deployment.yaml
+
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  name: emp-mgmt  # 🔹 Changed from "emp_mgmt" to "emp-mgmt"
+spec:
+  replicas: 2
+  selector:
+    matchLabels:
+      app: emp-mgmt
+  template:
+    metadata:
+      labels:
+        app: emp-mgmt
+    spec:
+      imagePullSecrets:
+      - name: ocirsecret
+      containers:
+      - name: emp-mgmt  # 🔹 Changed from "emp_mgmt" to "emp-mgmt"
+        image: ocir.ap-hyderabad-1.oci.oraclecloud.com/axslrersvche/repo1:latest
+        ports:
+        - containerPort: 5000
+
