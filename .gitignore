@@ -57,3 +57,9 @@ node_modules/
 
 # test files
 test.py
+
+*.tar
+*.tar.gz
+*.zip
+*.bak
+*.log
