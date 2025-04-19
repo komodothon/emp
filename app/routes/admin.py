@@ -1,10 +1,12 @@
 """admin.py"""
 
 from flask import Blueprint, render_template, request, jsonify
-from app.models import Department, Role, Designation, ContractType, Status
+from app.models import Department, Role, Designation, ContractType, Status, User
 from extensions import db
 from flask_login import login_required
 from app.services import role_required
+from sqlalchemy import func
+from pprint import pprint
 
 admin_bp = Blueprint("admin", __name__, url_prefix="/admin")
 
@@ -24,15 +26,42 @@ def admin_dashboard():
     data = {}
     for model in criteria:
         data[model] = model.query.all()
-    
     # Debugging line to check the data being passed to the template
-    # print(data) 
+    # pprint(data) 
     
-    return render_template("admin_dashboard.html", data=data)
+    # Overview stats
+    total_employees = User.query.count()
+
+    employees_by_department = db.session.query(
+        Department.name, func.count(User.id).label("No. of Users")
+    ).join(User, User.department_id == Department.id).group_by(Department.name).all()
+    # pprint(f"employees_by_department: {employees_by_department}")
+
+    
+    employees_by_role = db.session.query(
+        Role.name, func.count(User.id).label("No. of Users")
+    ).join(User, User.role_id == Role.id).group_by(Role.name).all()
+    # print(f"employees_by_role: {employees_by_role}")
+
+    employees_by_status = db.session.query(
+        Status.name, func.count(User.id).label("No. of Users")
+    ).join(User, User.status_id == Status.id).group_by(Status.name).all()
+    # print(f"employees by status: {employees_by_status}")
+
+    overview = {
+        "total_employees": total_employees,
+        "by_department": employees_by_department,
+        "by_role": employees_by_role,
+        "by_status": employees_by_status,
+    }
+
+
+    return render_template("admin_dashboard.html", data=data, overview=overview)
 
 
 @admin_bp.route("/add_criteria", methods=["POST"])
 @login_required
+@role_required("SuperAdmin")
 def add_item():
     data = request.get_json()
     category = data.get("category")
@@ -49,6 +78,7 @@ def add_item():
 
 @admin_bp.route("/edit_criteria", methods=["POST"])
 @login_required
+@role_required("SuperAdmin")
 def edit_item():
     data = request.get_json()
     category = data.get("category")

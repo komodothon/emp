@@ -3,86 +3,145 @@
 {% block title %}
     Admin Dashboard
 {% endblock %}
+
 {% block content %}
-    <div class="container-fluid">
-        <h1 class="mb-4">Admin Dashboard</h1>
-        <div class="row">
-            {% for model, items in data.items() %}
-                <div class="col-md-6 mb-4">
-                    <div class="card shadow">
-                        <div class="card-header bg-primary text-white d-flex justify-content-between align-items-center">
-                            <span>{{ model.category_name }}</span>
-                            <button class="btn btn-warning btn-sm add-btn" data-category="{{ model.category_name }}">Add New</button>
-                        </div>
-                        <div class="card-body">
-                            {% if items %}
-                                <table class="table table-striped">
-                                    <thead class="table-secondary">
-                                        <tr>
-                                            {% for column_title in model.get_headers() %}
-                                                <th>{{ column_title|capitalize }}</th>
-                                            {% endfor %}
-                                            <th>Actions</th>
+<div class="container-fluid">
+    <h1 class="mb-4">Admin Dashboard</h1>
 
-                                        </tr>
-                                    </thead>
-                                    <tbody>
-                                        {% for item in items %}
-                                        <tr>
-                                            {% for col in model.get_headers() %}
-                                                <td>{{ item[col] }}</td>
-                                            {% endfor %}
-
-                                            <td>
-                                                <button class="btn btn-outline-primary btn-sm edit-btn" data-id="{{ item.id }}" data-category="{{ model.category_name }}">Edit</button>
-                                            </td>
-                                        </tr>
-                                        {% endfor %}
-                                    </tbody>
-                                </table>
-                            {% else %}
-                                <div class="alert alert-warning text-center" role="alert">
-                                    No {{ model.category_name | lower }} found.
-                                </div>
-                            {% endif %}
-                        </div>
-                    </div>
+    <!-- Overview Cards -->
+    <div class="row mb-4">
+        <!-- Total Employees -->
+        <div class="col-md-3 mb-3">
+            <div class="card text-white bg-info shadow h-100">
+                <div class="card-body">
+                    <h5 class="card-title">Total Employees</h5>
+                    <p class="card-text fs-4">{{ overview.total_employees }}</p>
                 </div>
-            {% endfor %}
+            </div>
         </div>
+
+        <!-- Employees by Department -->
+        <div class="col-md-3 mb-3">
+            <div class="card bg-light shadow h-100">
+                <div class="card-body">
+                    <h5 class="card-title">By Department</h5>
+                    <ul class="list-unstyled">
+                        {% for department, count in overview.by_department %}
+                            <li>{{ department }}: <strong>{{ count }}</strong></li>
+                        {% endfor %}
+                    </ul>
+                </div>
+            </div>
+        </div>
+        
+        <!-- Employees by Status -->
+        <div class="col-md-3 mb-3">
+            <div class="card bg-light shadow h-100">
+                <div class="card-body">
+                    <h5 class="card-title">By Status</h5>
+                    <ul class="list-unstyled">
+                        {% for status, count in overview.by_status %}
+                            <li>{{ status }}: <strong>{{ count }}</strong></li>
+                        {% endfor %}
+                    </ul>
+                </div>
+            </div>
+        </div>
+
+        <!-- Employees by Role -->
+        <div class="col-md-3 mb-3">
+            <div class="card bg-light shadow h-100">
+                <div class="card-body">
+                    <h5 class="card-title">By Role</h5>
+                    <ul class="list-unstyled">
+                        {% for role, count in overview.by_role %}
+                            <li>{{ role }}: <strong>{{ count }}</strong></li>
+                        {% endfor %}
+                    </ul>
+                </div>
+            </div>
+        </div>
+
+
     </div>
 
-    <script>
-        document.addEventListener("DOMContentLoaded", function() {
-            document.querySelectorAll(".add-btn").forEach(button => {
-                button.addEventListener("click", function() {
-                    let category = this.getAttribute("data-category");
-                    let name = prompt(`Enter new ${category} name:`);
-                    if (name) {
-                        fetch("/admin/add_criteria", {
-                            method: "POST",
-                            headers: { "Content-Type": "application/json" },
-                            body: JSON.stringify({ category, name })
-                        }).then(() => location.reload());
-                    }
-                });
-            });
 
-            document.querySelectorAll(".edit-btn").forEach(button => {
-                button.addEventListener("click", function() {
-                    let id = this.getAttribute("data-id");
-                    let category = this.getAttribute("data-category");
-                    let newName = prompt("Enter new name:");
-                    if (newName) {
-                        fetch("/admin/edit_criteria", {
-                            method: "POST",
-                            headers: { "Content-Type": "application/json" },
-                            body: JSON.stringify({ id, category, name: newName })
-                        }).then(() => location.reload());
-                    }
-                });
-            });
+    <!-- CRUD Section -->
+    <div class="row">
+        {% for model, items in data.items() %}
+            <div class="col-md-6 mb-4">
+                <div class="card shadow">
+                    <div class="card-header bg-primary text-white d-flex justify-content-between align-items-center">
+                        <span>{{ model.category_name }}</span>
+                        <button class="btn btn-warning btn-sm add-btn" data-category="{{ model.category_name }}">Add New</button>
+                    </div>
+                    <div class="card-body">
+                        {% if items %}
+                            <table class="table table-striped">
+                                <thead class="table-secondary">
+                                    <tr>
+                                        {% for column_title in model.get_headers() %}
+                                            <th>{{ column_title|capitalize }}</th>
+                                        {% endfor %}
+                                        <th>Actions</th>
+                                    </tr>
+                                </thead>
+                                <tbody>
+                                    {% for item in items %}
+                                    <tr>
+                                        {% for col in model.get_headers() %}
+                                            <td>{{ item[col] }}</td>
+                                        {% endfor %}
+                                        <td>
+                                            <button class="btn btn-outline-primary btn-sm edit-btn" data-id="{{ item.id }}" data-category="{{ model.category_name }}">Edit</button>
+                                        </td>
+                                    </tr>
+                                    {% endfor %}
+                                </tbody>
+                            </table>
+                        {% else %}
+                            <div class="alert alert-warning text-center" role="alert">
+                                No {{ model.category_name | lower }} found.
+                            </div>
+                        {% endif %}
+                    </div>
+                </div>
+            </div>
+        {% endfor %}
+    </div>
+</div>
 
+<!-- JavaScript -->
+<script>
+    document.addEventListener("DOMContentLoaded", function() {
+        document.querySelectorAll(".add-btn").forEach(button => {
+            button.addEventListener("click", function() {
+                let category = this.getAttribute("data-category");
+                let name = prompt(`Enter new ${category} name:`);
+                if (name) {
+                    fetch("/admin/add_criteria", {
+                        method: "POST",
+                        headers: { "Content-Type": "application/json" },
+                        body: JSON.stringify({ category, name })
+                    }).then(() => location.reload());
+                }
+            });
         });
-    </script>
+
+        document.querySelectorAll(".edit-btn").forEach(button => {
+            button.addEventListener("click", function() {
+                let id = this.getAttribute("data-id");
+                let category = this.getAttribute("data-category");
+                let newName = prompt("Enter new name:");
+                if (newName) {
+                    fetch("/admin/edit_criteria", {
+                        method: "POST",
+                        headers: { "Content-Type": "application/json" },
+                        body: JSON.stringify({ id, category, name: newName })
+                    }).then(() => location.reload());
+                }
+            });
+        });
+    });
+</script>
 {% endblock %}
