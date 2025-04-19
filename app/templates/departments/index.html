@@ -1,0 +1,43 @@
+{% extends "layout.html" %}
+
+{% block title %}
+    Departments
+{% endblock %}
+
+{% block content %}
+    <h3>Departments Home</h3>
+
+
+    <div class="container mt-5">
+        <h2 class="mb-4">Departments</h2>
+        <a href="{{ url_for('departments.add_department') }}" class="btn btn-primary mb-3">Add New Department</a>
+    
+        <table class="table table-hover table-bordered">
+        <thead class="table-dark">
+            <tr>
+            <th>ID</th>
+            <th>Name</th>
+            <th>Description</th>
+            <th>Parent</th>
+            <th>Actions</th>
+            </tr>
+        </thead>
+        <tbody>
+            {% for dept in departments %}
+            <tr>
+            <td>{{ dept.id }}</td>
+            <td>{{ dept.name }}</td>
+            <td>{{ dept.description or '—' }}</td>
+            <td>{{ dept.parent.name if dept.parent else "—" }}</td>
+            <td>
+                <a href="{{ url_for('departments.edit_department', dept_id=dept.id) }}" class="btn btn-sm btn-warning">Edit</a>
+                <form method="POST" action="{{ url_for('departments.delete_department', dept_id=dept.id) }}" class="d-inline">
+                <button type="submit" class="btn btn-sm btn-danger" onclick="return confirm('Delete this department?');">Delete</button>
+                </form>
+            </td>
+            </tr>
+            {% endfor %}
+        </tbody>
+        </table>
+</div>
+{% endblock %}

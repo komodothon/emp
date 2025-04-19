@@ -10,6 +10,8 @@ load_dotenv()
 
 env = os.environ.get("FLASK_ENV", "production").lower()
 
+# print(f"run.py ennv: {env}")
+
 if env == "development":
     config_class = "config.DevConfig"
 elif env == "testing":
@@ -17,6 +19,7 @@ elif env == "testing":
 else:
     config_class = "config.ProdConfig"
 
+print(f"run.py config_class: {config_class}")
 
 
 # This line is needed in this place outside 'main' for Gunicorn while deploying

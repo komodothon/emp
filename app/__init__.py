@@ -4,7 +4,7 @@ import os
 
 
 from flask import Flask
-from extensions import db, loginmanager, bcrypt
+from extensions import db, loginmanager, bcrypt, migrate
 from dotenv import load_dotenv
 
 load_dotenv()
@@ -19,6 +19,8 @@ def create_app(config_class="config.DevConfig"):
     loginmanager.init_app(app)
     bcrypt.init_app(app)
 
+    migrate.init_app(app, db)
+
     # Import your models BEFORE create_all()
     from app.models import User, UserCredential, Department, Role, Designation, ContractType, Status
 
@@ -31,8 +33,8 @@ def create_app(config_class="config.DevConfig"):
 
     # Register blueprints
     from app.routes import all_blueprints
-    for bp in all_blueprints:
-        app.register_blueprint(bp)
+    for blueprint in all_blueprints:
+        app.register_blueprint(blueprint)
     
 
     return app

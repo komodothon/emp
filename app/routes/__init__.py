@@ -6,9 +6,11 @@ from flask import Blueprint
 from .admin import admin_bp
 from .auth import auth_bp
 from .main import main_bp
+from .departments import departments_bp
 
 all_blueprints = [
     admin_bp,
     auth_bp,
     main_bp,
+    departments_bp,
 ]

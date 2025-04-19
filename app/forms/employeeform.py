@@ -1,13 +1,9 @@
-"""forms/forms.py"""
+"""app/forms/employeeform.py"""
 
 from flask_wtf import FlaskForm
 from wtforms import StringField, EmailField, DateField, SelectField, SubmitField, PasswordField
 from wtforms.validators import DataRequired
 
-class LoginForm(FlaskForm):
-    username = StringField("Username", validators=[DataRequired()])
-    password = PasswordField("Password", validators=[DataRequired()])
-    submit = SubmitField("Login")
 
 class EmployeeForm(FlaskForm):
     username = StringField("Username", validators=[DataRequired()])

@@ -8,6 +8,14 @@ class Department(BaseModel):
 
     category_name = "Departments"
     display_columns = ['id', 'name']
+    parent_id = db.Column(db.Integer, db.ForeignKey("departments.id"),nullable=True)
+    
+    # relationship
+    parent = db.relationship(
+        "Department", 
+        remote_side=lambda: [Department.id], 
+        backref=db.backref("subdepartments", lazy="dynamic"),
+    )
 
 class Role(BaseModel):
     __tablename__ = 'roles'

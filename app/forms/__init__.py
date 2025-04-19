@@ -1,3 +1,5 @@
 """app/forms/__init__.py"""
 
-from .forms import LoginForm, EmployeeForm
+from .employeeform import EmployeeForm
+from .loginform import LoginForm
+from .departmentform import DepartmentForm
