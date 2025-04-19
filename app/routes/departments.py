@@ -103,3 +103,9 @@ def edit_department(id):
     form.parent_id.data = dept.parent_id if dept.parent_id else 0
 
     return render_template("departments/edit.html", form=form)
+
+@departments_bp.route("/delete/<int:id>", methods=["GET", "POST"])
+@login_required
+@role_required("SuperAdmin")
+def delete_department(id):
+    return "Delete Department"
