@@ -33,15 +33,11 @@ def login():
                 flash("Username and password required", "warning")
                 return render_template("login.html", form=login_form)
             
-            print(f"username: {username}; user_cred: {user_cred}")
-            
             try:
                 user = User.query.filter_by(username=username).first()
-                print(f"User found: {user}")
-                print(f"password on record: {user.credential.password_hash}")
+
                 if user and user.check_password(user_cred):
                     login_user(user)
-                    print("user logged in: {user.username}")
 
                     flash(f"Logged in as {user.username}", "success")
                     return redirect(url_for("main.dashboard"))

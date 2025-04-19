@@ -26,8 +26,6 @@ def admin_dashboard():
     data = {}
     for model in criteria:
         data[model] = model.query.all()
-    # Debugging line to check the data being passed to the template
-    # pprint(data) 
     
     # Overview stats
     total_employees = User.query.count()
@@ -35,18 +33,14 @@ def admin_dashboard():
     employees_by_department = db.session.query(
         Department.name, func.count(User.id).label("No. of Users")
     ).join(User, User.department_id == Department.id).group_by(Department.name).all()
-    # pprint(f"employees_by_department: {employees_by_department}")
-
     
     employees_by_role = db.session.query(
         Role.name, func.count(User.id).label("No. of Users")
     ).join(User, User.role_id == Role.id).group_by(Role.name).all()
-    # print(f"employees_by_role: {employees_by_role}")
 
     employees_by_status = db.session.query(
         Status.name, func.count(User.id).label("No. of Users")
     ).join(User, User.status_id == Status.id).group_by(Status.name).all()
-    # print(f"employees by status: {employees_by_status}")
 
     overview = {
         "total_employees": total_employees,
@@ -54,7 +48,6 @@ def admin_dashboard():
         "by_role": employees_by_role,
         "by_status": employees_by_status,
     }
-
 
     return render_template("admin_dashboard.html", data=data, overview=overview)
 
