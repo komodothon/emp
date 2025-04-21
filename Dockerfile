@@ -18,6 +18,9 @@ RUN pip install --no-cache-dir -r requirements.txt
 # Copy the rest of the application files
 COPY . .
 
+# Copy .env file into the image
+COPY .env .env
+
 # Copy and make entrypoint executable
 COPY entrypoint.sh /entrypoint.sh
 RUN chmod +x /entrypoint.sh

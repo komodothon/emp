@@ -6,7 +6,9 @@ from dotenv import load_dotenv
 from app import create_app
 
 # Load environment variables
-load_dotenv() 
+load_dotenv(dotenv_path=".env") 
+
+print(f"FLASK_ENV after load_dotenv: {os.getenv('FLASK_ENV')}")
 
 env = os.environ.get("FLASK_ENV", "production").lower()
 
