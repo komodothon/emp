@@ -8,7 +8,14 @@ class Department(BaseModel):
 
     category_name = "Departments"
     display_columns = ['id', 'name']
-    parent_id = db.Column(db.Integer, db.ForeignKey("departments.id"),nullable=True)
+    parent_id = db.Column(
+        db.Integer, 
+        db.ForeignKey(
+            "departments.id",
+            use_alter=True, 
+            name='fk_department_parent'),
+        nullable=True,     
+    )
     
     # relationship
     parent = db.relationship(

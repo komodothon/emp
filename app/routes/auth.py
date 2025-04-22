@@ -2,6 +2,7 @@
 
 from flask import Blueprint, render_template, request, redirect, url_for, flash
 from flask_login import login_user, logout_user, login_required, current_user
+from urllib.parse  import urlparse
 
 from extensions import db, loginmanager, bcrypt
 from app.models import User
@@ -19,35 +20,46 @@ def load_user(user_id):
 
 @auth_bp.route("/", methods=["GET", "POST"])
 def login():        
-        login_form = LoginForm()
+    form = LoginForm()
+    print("[DEBUG] login() route hit")
+    
+    # Check if the user is already logged in
+    if current_user.is_authenticated:
+        return redirect(url_for("main.dashboard"))
+
+    
+    if form.validate_on_submit():
+        username = form.username.data
+        user_cred = form.password.data
+
+        if not username and not user_cred:
+            flash("Username and password required", "warning")
+            return render_template("login.html", form=form)
         
-        # Check if the user is already logged in
-        if current_user.is_authenticated:
-            return redirect(url_for("main.dashboard"))
-        
-        if request.method == "POST":
-            username = request.form.get("username")
-            user_cred = request.form.get("password")
+        try:
+            user = User.query.filter_by(username=username).first()
 
-            if not username and not user_cred:
-                flash("Username and password required", "warning")
-                return render_template("login.html", form=login_form)
-            
-            try:
-                user = User.query.filter_by(username=username).first()
+            if user and user.check_password(user_cred):
+                login_user(user)
+                
+                flash(f"Logged in as {user.username}", "success")
 
-                if user and user.check_password(user_cred):
-                    login_user(user)
+                next_page = request.args.get("next")
 
-                    flash(f"Logged in as {user.username}", "success")
-                    return redirect(url_for("main.dashboard"))
-                else:
-                    flash("Invalid username or password", "danger")
+                if not next_page or urlparse(next_page).netloc != "":
+                    next_page = url_for("main.dashboard")
 
-            except Exception as e:
-                print(f"[Login error]: {e}")
-                flash("An error occurred. Please try again.", "danger")
-        return render_template("login.html", form=login_form)
+                return redirect(next_page)
+
+            else:
+                flash("Invalid username or password", "danger")
+
+        except Exception as e:
+            print(f"[Login error]: {e}")
+            flash("An error occurred. Please try again.", "danger")
+
+    return render_template("login.html", form=form)
+
 
 @auth_bp.route("/logout")
 @login_required

@@ -26,10 +26,11 @@ def create_app(config_class="config.DevConfig"):
 
     # Create tables only for dev config
     if os.getenv("FLASK_ENV") == "development":
+        print(f'[app/__init__.py] FLASK_ENV: {os.getenv("FLASK_ENV")}')
 
-        with app.app_context():
-                db.create_all()
-                print("[INFO] Tables created (FLASK_ENV=development)")
+        # with app.app_context():
+        #         db.create_all()
+        #         print("[INFO] Tables created (FLASK_ENV=development)")
 
     # Register blueprints
     from app.routes import all_blueprints

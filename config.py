@@ -10,7 +10,8 @@ basedir = os.path.abspath(os.path.dirname(__file__))
 
 
 class Config:
-    SECRET_KEY = os.environ.get("SECRET_KEY", "default-secret-key")
+    # SECRET_KEY = os.environ.get("SECRET_KEY", "app_secret_key")
+    SECRET_KEY = "a_very_secret_and_long_dev_key_123456789"
     SQLALCHEMY_TRACK_MODIFICATIONS = False
     BCRYPT_LOG_ROUNDS = 12
     SESSION_COOKIE_SECURE = True
