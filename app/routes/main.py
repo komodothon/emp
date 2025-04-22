@@ -12,8 +12,6 @@ main_bp = Blueprint("main", __name__)
 @main_bp.route("/dashboard")
 @login_required
 def dashboard():
-    from flask import session
-    print(f"[DEBUG] session content: {dict(session)}")
 
     try:
         users = User.query.all()
