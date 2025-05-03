@@ -1,0 +1,36 @@
+.
+├── app
+│   ├── forms
+│   ├── __init__.py
+│   ├── models
+│   ├── routes
+│   ├── services
+│   ├── static
+│   └── templates
+├── config.py
+├── docker-compose.yml
+├── Dockerfile
+├── emp_app.tar.gz
+├── entrypoint.sh
+├── extensions.py
+├── instance
+│   └── dev.db
+├── k8s
+│   └── deployment.yaml
+├── migrations
+│   ├── alembic.ini
+│   ├── env.py
+│   ├── README
+│   ├── script.py.mako
+│   └── versions
+├── project_tree.txt
+├── README.md
+├── requirements.txt
+├── run.py
+├── seed
+│   ├── mod_contr_end_date.py
+│   ├── setup_admin_db.py
+│   └── setup_db.py
+└── todo.txt
+
+13 directories, 21 files

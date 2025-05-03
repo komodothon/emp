@@ -48,6 +48,12 @@
                         <div class="col-lg-6 col-md-12">
                             <p><strong>Hire Date:</strong> {{ employee.hire_date.strftime('%d %B %Y') }}</p>
                         </div>
+                        <div class="col-lg-6 col-md-12">
+                            <p><strong>Contract End Date:</strong> {{ employee.contract_end_date.strftime('%d %B %Y') if employee.contract_end_date is not none else "-" }}</p>
+                        </div>
+
+
+
                     </div>
 
                     <hr>

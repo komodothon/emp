@@ -180,6 +180,7 @@
                             <th>Role</th>
                             <th>Designation</th>
                             <th>Contract Type</th>
+                            <th>Contract End Date</th>
                             <th>Phone</th>
                             <th>Status</th>
                             <th>View</th>  <!-- Added column for View button -->
@@ -196,6 +197,7 @@
                             <td>{{ user.role.name }}</td>
                             <td>{{ user.designation.name }}</td>
                             <td>{{ user.contract_type.name }}</td>
+                            <td>{{ user.contract_end_date if user.contract_end_date is not none else "-"}}</td>
                             <td>{{ user.phone }}</td>
                             <td>
                                 <span class="text-center badge bg-{{ 'success' if user.status.name == 'Active' else 'danger' }}">

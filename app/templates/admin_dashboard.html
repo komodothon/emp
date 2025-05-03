@@ -5,143 +5,200 @@
 {% endblock %}
 
 {% block content %}
-<div class="container-fluid">
-    <h1 class="mb-4">Admin Dashboard</h1>
 
-    <!-- Overview Cards -->
-    <div class="row mb-4">
-        <!-- Total Employees -->
-        <div class="col-md-3 mb-3">
-            <div class="card text-white bg-info shadow h-100">
-                <div class="card-body">
-                    <h5 class="card-title">Total Employees</h5>
-                    <p class="card-text fs-4">{{ overview.total_employees }}</p>
-                </div>
-            </div>
-        </div>
+    <div class="container-fluid">
+        <h1 class="mb-4">Admin Dashboard</h1>   
 
-        <!-- Employees by Department -->
-        <div class="col-md-3 mb-3">
-            <div class="card bg-light shadow h-100">
-                <div class="card-body">
-                    <h5 class="card-title">By Department</h5>
-                    <ul class="list-unstyled">
-                        {% for department, count in overview.by_department %}
-                            <li>{{ department }}: <strong>{{ count }}</strong></li>
-                        {% endfor %}
-                    </ul>
-                </div>
-            </div>
-        </div>
-        
-        <!-- Employees by Status -->
-        <div class="col-md-3 mb-3">
-            <div class="card bg-light shadow h-100">
-                <div class="card-body">
-                    <h5 class="card-title">By Status</h5>
-                    <ul class="list-unstyled">
-                        {% for status, count in overview.by_status %}
-                            <li>{{ status }}: <strong>{{ count }}</strong></li>
-                        {% endfor %}
-                    </ul>
-                </div>
-            </div>
-        </div>
+        <!-- Overview Cards -->
+        <div class="row mb-4">
 
-        <!-- Employees by Role -->
-        <div class="col-md-3 mb-3">
-            <div class="card bg-light shadow h-100">
-                <div class="card-body">
-                    <h5 class="card-title">By Role</h5>
-                    <ul class="list-unstyled">
-                        {% for role, count in overview.by_role %}
-                            <li>{{ role }}: <strong>{{ count }}</strong></li>
-                        {% endfor %}
-                    </ul>
-                </div>
-            </div>
-        </div>
-
-
-    </div>
-
-
-    <!-- CRUD Section -->
-    <div class="row">
-        {% for model, items in data.items() %}
-            <div class="col-md-6 mb-4">
-                <div class="card shadow">
-                    <div class="card-header bg-primary text-white d-flex justify-content-between align-items-center">
-                        <span>{{ model.category_name }}</span>
-                        <button class="btn btn-warning btn-sm add-btn" data-category="{{ model.category_name }}">Add New</button>
+            <!-- Employees by Status -->
+            <div class="col-md-4 mb-3">
+                <div class="card">
+                    <div class="card-body text-center" style="height: 450px; display: flex; flex-direction: column; justify-content: space-between;">
+                        <h5 class="card-title">Employee Distribution</h5>
+                        <canvas id="statusChart" width="300" height="300"></canvas>
                     </div>
+                </div>
+            </div>
+
+            <!-- Employees by Department -->
+            <div class="col-md-4 mb-3">
+                <div class="card border-secondary">
+                    <div class="card-body text-center" style="height: 450px; display: flex; flex-direction: column; justify-content: space-between;">
+                        <h5 class="card-title">Employees by Department</h5>
+                        <canvas id="departmentChart" width="300" height="300"></canvas>
+                    </div>
+                </div>
+            </div>
+
+            <!-- Employees by Role -->
+            <div class="col-md-4 mb-3">
+                <div class="card bg-light shadow h-100">
+                    <div class="card-body text-center" style="height: 450px; display: flex; flex-direction: column; justify-content: space-between;">
+                        <h5 class="card-title">Employees by Role</h5>
+                        <canvas id="roleChart" width="300" height="300"></canvas>
+                    </div>
+                </div>
+            </div>
+
+        </div>
+
+
+        <!-- Critical Alerts -->
+        <div class="row mb-4">
+            {% for title, value in dashboard_data['critical_alerts'].items() %}
+            <div class="col-md-4">
+                <div class="card border-{{ 'danger' if 'contracts' in title else 'warning' if 'resignations' in title else 'success' }}">
                     <div class="card-body">
-                        {% if items %}
-                            <table class="table table-striped">
-                                <thead class="table-secondary">
-                                    <tr>
-                                        {% for column_title in model.get_headers() %}
-                                            <th>{{ column_title|capitalize }}</th>
-                                        {% endfor %}
-                                        <th>Actions</th>
-                                    </tr>
-                                </thead>
-                                <tbody>
-                                    {% for item in items %}
-                                    <tr>
-                                        {% for col in model.get_headers() %}
-                                            <td>{{ item[col] }}</td>
-                                        {% endfor %}
-                                        <td>
-                                            <button class="btn btn-outline-primary btn-sm edit-btn" data-id="{{ item.id }}" data-category="{{ model.category_name }}">Edit</button>
-                                        </td>
-                                    </tr>
-                                    {% endfor %}
-                                </tbody>
-                            </table>
-                        {% else %}
-                            <div class="alert alert-warning text-center" role="alert">
-                                No {{ model.category_name | lower }} found.
-                            </div>
-                        {% endif %}
+                        <h5 class="card-title text-{{ 'danger' if 'contracts' in title else 'warning' if 'resignations' in title else 'success' }}">{{ title }}</h5>
+                        <p class="card-text">{{ value }}</p>
                     </div>
                 </div>
             </div>
-        {% endfor %}
+            {% endfor %}
+        </div>
+
+        <!-- Center wrapper -->
+        <div class="d-flex justify-content-center align-items-center my-4">
+            <div id="content1" class="collapsible text-center">
+
+                <!-- Jinja2 Tree Rendering -->
+                <h3 class="mt-4 toggle-header" data-target="#content2">Department Hierarchy</h3>
+                <div id="content2" class="collapsible">
+                    {% macro render_node(dept) %}
+                        <li>
+                            {{ dept.name }}
+                            {% if dept.children %}
+                                <ul>
+                                    {% for child in dept.children %}
+                                        {{ render_node(child) }}
+                                    {% endfor %}
+                                </ul>
+                            {% endif %}
+                        </li>
+                    {% endmacro %}
+
+                    <ul class="list-unstyled">
+                        {% for dept in dashboard_data["departments_tree"].values() %}
+                            {{ render_node(dept) }}
+                        {% endfor %}
+                    </ul>
+                </div>
+            </div>
+        </div>
+
+
+        <!-- Recent Changes -->
+        <div class="mb-4">
+            <div class="card border-dark">
+                <div class="card-body">
+                    <h5 class="card-title">Recent Changes</h5>
+                    <ul class="list-group">
+                        {% for change in dashboard_data['recent_changes'] %}
+                            <li class="list-group-item">{{ change }}</li>
+                        {% endfor %}
+                    </ul>
+                </div>
+            </div>
+        </div>
     </div>
-</div>
 
-<!-- JavaScript -->
-<script>
-    document.addEventListener("DOMContentLoaded", function() {
-        document.querySelectorAll(".add-btn").forEach(button => {
-            button.addEventListener("click", function() {
-                let category = this.getAttribute("data-category");
-                let name = prompt(`Enter new ${category} name:`);
-                if (name) {
-                    fetch("/admin/add_criteria", {
-                        method: "POST",
-                        headers: { "Content-Type": "application/json" },
-                        body: JSON.stringify({ category, name })
-                    }).then(() => location.reload());
-                }
+    <!-- Chart Script -->
+    <script>
+        document.addEventListener("DOMContentLoaded", function() {
+            // Function to create a pie chart
+            function renderPieChart(chartId, labels, data, backgroundColors, borderColors) {
+                const ctx = document.getElementById(chartId).getContext('2d');
+                new Chart(ctx, {
+                    type: 'pie',
+                    data: {
+                        labels: labels,
+                        datasets: [{
+                            data: data,
+                            backgroundColor: backgroundColors,
+                            borderColor: borderColors,
+                            borderWidth: 1
+                        }]
+                    },
+                    options: {
+                        maintainAspectRatio: false,
+                        aspectRatio: 1.5, 
+                        plugins: {
+                            legend: { position: 'right' },
+                            tooltip: {
+                                callbacks: {
+                                    label: context => {
+                                        const total = context.dataset.data.reduce((a, b) => a + b, 0);
+                                        const percentage = (context.raw / total * 100).toFixed(1);
+                                        return `${context.label}: ${context.raw} (${percentage}%)`;
+                                    }
+                                }
+                            },
+                            datalabels: {
+                                display: true,
+                                formatter: (value, ctx) => {
+                                    const total = ctx.dataset.data.reduce((a, b) => a + b, 0);
+                                    const percentage = (value / total * 100).toFixed(1);
+                                    const label = ctx.chart.data.labels[ctx.dataIndex];
+                                    return `${label}: ${value} (${percentage}%)`;
+                                },
+                                color: '#fff',
+                                font: { weight: 'bold', size: 14 }
+                            }
+                        }
+                    }
+                });
+            }
+        
+            // Data for charts (these should come from your backend or Jinja2 rendering)
+            const dashboardData = {{ dashboard_data | tojson }};
+            
+            // Destructure the data for each chart
+            const { organization_health, employee_distribution } = dashboardData;
+            const { by_department, by_role } = employee_distribution;
+        
+            // Render each chart
+            renderPieChart('statusChart', 
+                ['Active Employees', 'Inactive Employees'], 
+                [organization_health.active_employees, organization_health.inactive_employees], 
+                ['rgba(40, 167, 69, 0.7)', 'rgba(220, 53, 69, 0.7)'], 
+                ['rgba(40, 167, 69, 1)', 'rgba(220, 53, 69, 1)']);
+        
+            renderPieChart('departmentChart', 
+                Object.keys(by_department), 
+                Object.values(by_department), 
+                ['rgba(0, 123, 255, 0.7)', 'rgba(255, 193, 7, 0.7)', 'rgba(40, 167, 69, 0.7)'], 
+                ['rgba(0, 123, 255, 1)', 'rgba(255, 193, 7, 1)', 'rgba(40, 167, 69, 1)']);
+        
+            renderPieChart('roleChart', 
+                Object.keys(by_role), 
+                Object.values(by_role), 
+                ['rgba(23, 162, 184, 0.7)', 'rgba(255, 99, 132, 0.7)', 'rgba(54, 162, 235, 0.7)'], 
+                ['rgba(23, 162, 184, 1)', 'rgba(255, 99, 132, 1)', 'rgba(54, 162, 235, 1)']);
+        });
+    </script>
+    
+
+    <!-- Toggle Collapsible Sections -->
+    <script>
+        document.addEventListener("DOMContentLoaded", function () {
+            document.querySelectorAll(".toggle-header").forEach(function (header) {
+                header.style.cursor = "pointer";
+                header.addEventListener("click", function () {
+                    const targetSelector = this.dataset.target;
+                    const target = document.querySelector(targetSelector);
+                    if (target) {
+                        target.style.display = target.style.display === "none" ? "block" : "none";
+                    }
+                });
+            });
+
+            // Open all by default
+            document.querySelectorAll(".collapsible").forEach(el => {
+                el.style.display = "block";
             });
         });
+    </script>
 
-        document.querySelectorAll(".edit-btn").forEach(button => {
-            button.addEventListener("click", function() {
-                let id = this.getAttribute("data-id");
-                let category = this.getAttribute("data-category");
-                let newName = prompt("Enter new name:");
-                if (newName) {
-                    fetch("/admin/edit_criteria", {
-                        method: "POST",
-                        headers: { "Content-Type": "application/json" },
-                        body: JSON.stringify({ id, category, name: newName })
-                    }).then(() => location.reload());
-                }
-            });
-        });
-    });
-</script>
 {% endblock %}

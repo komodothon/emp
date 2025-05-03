@@ -1,0 +1,54 @@
+/* static/css/style.css */
+
+html, body {
+    height: 100%;
+    margin: 0;
+    display: flex;
+    flex-direction: column;
+}
+
+.wrapper {
+    flex: 1;
+    display: flex;
+    flex-direction: row;
+}
+
+#sidebar {
+    position: fixed;
+    top: 56px;
+    left: 0;
+    width: 200px;
+    height: calc(100vh - 56px);
+    background-color: #343a40;
+    color: white;
+    padding: 15px;
+    overflow-y: auto;
+}
+
+#main-content {
+    margin-left: 200px;
+    flex: 1;
+    padding: 20px;
+    overflow-x: hidden;
+}
+
+.footer {
+    background-color: #343a40;
+    color: white;
+    text-align: center;
+    padding: 10px 0;
+}
+
+.card {
+    max-width: 600px;
+    margin: auto;
+}
+
+body {
+    font-family: 'Roboto Condensed', sans-serif;
+}
+
+.collapsible {
+    display: none;
+    transition: all 0.3s ease;
+}

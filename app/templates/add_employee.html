@@ -47,7 +47,7 @@
 
                 <div class="mb-3">
                     {{ form.date_of_birth.label(class="form-label") }}
-                    {{ form.date_of_birth(class="form-control", type="date") }}
+                    {{ form.date_of_birth(class="form-control date-picker", type="date", placeholder="dd/mm/yyyy") }}
                 </div>
             </div>
 
@@ -80,7 +80,12 @@
 
                 <div class="mb-3">
                     {{ form.hire_date.label(class="form-label") }}
-                    {{ form.hire_date(class="form-control", type="date") }}
+                    {{ form.hire_date(class="form-control date-picker", type="date", placeholder="dd/mm/yyyy") }}
+                </div>
+
+                <div class="mb-3">
+                    {{ form.contract_end_date.label(class="form-label") }}
+                    {{ form.contract_end_date(class="form-control date-picker", type="date", placeholder="dd/mm/yyyy") }}
                 </div>
             </div>
         </div>
@@ -91,4 +96,6 @@
         </div>
     </form>
 </div>
+
+
 {% endblock %}

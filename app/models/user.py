@@ -1,7 +1,7 @@
 """app/models/user.py"""
 
 from flask_login import UserMixin
-from datetime import datetime, timezone
+from datetime import datetime
 from extensions import db, bcrypt
 from .base import BaseModel
 from .admin_entities import Department, Role, Designation, ContractType, Status
@@ -26,6 +26,8 @@ class User(UserMixin, BaseModel):
     address = db.Column(db.Text, nullable=True)
     date_of_birth = db.Column(db.Date, nullable=False)
     hire_date = db.Column(db.Date, nullable=False, default=datetime.now)
+
+    contract_end_date = db.Column(db.Date, nullable=True)
 
     # relationships
     credential = db.relationship("UserCredential", uselist=False, lazy="joined")

@@ -118,6 +118,7 @@ def edit_employee(id):
 
                 employee.date_of_birth = form.date_of_birth.data
                 employee.hire_date = form.hire_date.data
+                employee.contract_end_date = form.contract_end_date.data
                 
                 db.session.commit()
                 flash("Employee details updated successfully.", "success")
@@ -170,6 +171,7 @@ def add_employee():
 
                 date_of_birth=form.date_of_birth.data,
                 hire_date=form.hire_date.data,
+                contract_end_date = form.contract_end_date.data,
             )
 
             db.session.add(new_employee)

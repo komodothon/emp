@@ -1,0 +1,155 @@
+{% extends "layout.html" %}
+
+{% block title %}
+    Department Tree    
+{% endblock %}
+
+{% block content %}
+    <h1 class="mb-4 toggle-header" data-target="#content1">Test and Play</h1>
+    <div id="content1" class="collapsible">
+        
+        <!-- Jinja2 Tree Rendering -->
+        <h3 class="mt-4 toggle-header" data-target="#content2">Department Hierarchy (Jinja2 only)</h3>
+        <div id="content2" class="collapsible">
+            {% macro render_node(dept) %}
+                <li>
+                    {{ dept.name }}
+                    {% if dept.children %}
+                        <ul>
+                            {% for child in dept.children %}
+                                {{ render_node(child) }}
+                            {% endfor %}
+                        </ul>
+                    {% endif %}
+                </li>
+            {% endmacro %}
+
+            <ul>
+                {% for dept in tree.values() %}
+                    {{ render_node(dept) }}
+                {% endfor %}
+            </ul>
+        </div>
+
+        <!-- jsTree View -->
+        <h3 class="mt-5 toggle-header" data-target="#content3">Department Hierarchy (jsTree)</h3>
+        <div id="content3" class="collapsible mt-3 border p-3 bg-white rounded">
+            <div id="tree-container"></div>
+        </div>
+
+        <h3 class="mt-5 toggle-header" data-target="#content4">D3.js Tree Diagram</h3>
+        <div id="content4" class="collapsible mt-3 border p-3 bg-white rounded">
+            <div id="d3-tree" style="max-height: 500px; overflow-y: auto; text-align: center;"></div>
+        </div>        
+
+    </div>
+{% endblock %}
+
+
+{% block scripts %}
+    {{ super() }}
+
+    <!-- jsTree -->
+    <script>
+        const rawData = {{ tree | tojson | safe }};
+        const treeData = Object.values(rawData);
+
+        function convertToJsTree(data) {
+            return data.map(node => ({
+                text: node.name,
+                children: convertToJsTree(node.children || [])
+            }));
+        }
+
+        $(function () {
+            $('#tree-container').jstree({
+                'core': {
+                    'data': convertToJsTree(treeData)
+                }
+            });
+        });
+    </script>
+
+    <!-- d3 script -->
+    <script>
+        const data = {{ root_node | tojson | safe }};
+
+        const width = 600;        // narrower for less horizontal spread
+        const dx = 30;            // more vertical spacing
+        const dy = 100;           // shorter horizontal spacing
+        const tree = d3.tree().nodeSize([dx, dy]);
+
+        const diagonal = d3.linkHorizontal()
+            .x(d => d.x)
+            .y(d => d.y);
+
+        const root = d3.hierarchy(data);
+        root.x0 = 0;
+        root.y0 = 0;
+
+        const svg = d3.select("#d3-tree")
+            .append("svg")
+            .attr("width", width)
+            .attr("height", 600)
+            .style("font", "16px sans-serif")  // ⬅ bigger font
+            .style("user-select", "none")
+            .style("display", "block")
+            .style("margin", "0 auto");       // ⬅ center svg
+
+        const g = svg.append("g").attr("transform", "translate(40,40)");
+
+        const nodes = tree(root);
+
+        // Links
+        g.append("g")
+            .selectAll("path")
+            .data(nodes.links())
+            .join("path")
+            .attr("fill", "none")
+            .attr("stroke", "#555")
+            .attr("stroke-opacity", 0.4)
+            .attr("stroke-width", 1.5)
+            .attr("d", diagonal);
+
+        // Nodes
+        const node = g.append("g")
+            .selectAll("g")
+            .data(nodes.descendants())
+            .join("g")
+            .attr("transform", d => `translate(${d.x},${d.y})`);
+
+        node.append("circle")
+            .attr("r", 5)
+            .attr("fill", d => d.children ? "#555" : "#999");
+
+        node.append("text")
+            .attr("dy", "0.31em")
+            .attr("x", d => d.children ? -8 : 8)
+            .attr("text-anchor", d => d.children ? "end" : "start")
+            .text(d => d.data.name)
+            .clone(true).lower()
+            .attr("stroke", "white");
+    </script>
+
+
+    <!-- Toggle Collapsible Sections -->
+    <script>
+        document.addEventListener("DOMContentLoaded", function () {
+            document.querySelectorAll(".toggle-header").forEach(function (header) {
+                header.style.cursor = "pointer";
+                header.addEventListener("click", function () {
+                    const targetSelector = this.dataset.target;
+                    const target = document.querySelector(targetSelector);
+                    if (target) {
+                        target.style.display = target.style.display === "none" ? "block" : "none";
+                    }
+                });
+            });
+
+            // Open all by default
+            document.querySelectorAll(".collapsible").forEach(el => {
+                el.style.display = "block";
+            });
+        });
+    </script>
+{% endblock %}

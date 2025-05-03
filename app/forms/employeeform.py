@@ -19,8 +19,10 @@ class EmployeeForm(FlaskForm):
     contract_type = SelectField("Contract Type", choices=[], coerce=int)
     status = SelectField("Status", choices=[], coerce=int)
 
-    date_of_birth = DateField("Date of Birth", format="%Y-%m-%d")
-    hire_date = DateField("Hire Date", format="%Y-%m-%d", validators=[DataRequired()])
+    date_of_birth = DateField("Date of Birth", format="%d/%m/%Y")
+    hire_date = DateField("Hire Date", format="%d/%m/%Y", validators=[DataRequired()])
+
+    contract_end_date = DateField("Contract End Date", format="%d/%m/%Y", validators=[DataRequired()])
     submit = SubmitField("Save Changes")
 
 

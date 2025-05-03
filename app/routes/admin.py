@@ -1,12 +1,14 @@
 """admin.py"""
 
 from flask import Blueprint, render_template, request, jsonify
+
 from app.models import Department, Role, Designation, ContractType, Status, User
 from extensions import db
 from flask_login import login_required
 from app.services import role_required
 from sqlalchemy import func
 from pprint import pprint
+from app.services.admin_services import build_dashboard_data
 
 admin_bp = Blueprint("admin", __name__, url_prefix="/admin")
 
@@ -22,35 +24,13 @@ CATEGORY_MODELS = {
 @login_required
 @role_required("SuperAdmin")
 def admin_dashboard():
-    criteria = [Department, Role, Designation, ContractType, Status]
-    data = {}
-    for model in criteria:
-        data[model] = model.query.all()
-    
-    # Overview stats
-    total_employees = User.query.count()
 
-    employees_by_department = db.session.query(
-        Department.name, func.count(User.id).label("No. of Users")
-    ).join(User, User.department_id == Department.id).group_by(Department.name).all()
-    
-    employees_by_role = db.session.query(
-        Role.name, func.count(User.id).label("No. of Users")
-    ).join(User, User.role_id == Role.id).group_by(Role.name).all()
+    dashboard_data = build_dashboard_data()
 
-    employees_by_status = db.session.query(
-        Status.name, func.count(User.id).label("No. of Users")
-    ).join(User, User.status_id == Status.id).group_by(Status.name).all()
-
-    overview = {
-        "total_employees": total_employees,
-        "by_department": employees_by_department,
-        "by_role": employees_by_role,
-        "by_status": employees_by_status,
-    }
-
-    return render_template("admin_dashboard.html", data=data, overview=overview)
-
+    return render_template(
+        "admin_dashboard.html",
+        dashboard_data=dashboard_data,
+    )
 
 @admin_bp.route("/add_criteria", methods=["POST"])
 @login_required
