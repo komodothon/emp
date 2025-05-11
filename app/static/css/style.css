@@ -52,3 +52,11 @@ body {
     display: none;
     transition: all 0.3s ease;
 }
+
+#suggestion-box {
+    max-height: 300px;
+    overflow-y: auto;
+    position: absolute;
+    top: 100%;
+    left: 0;
+}

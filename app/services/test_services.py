@@ -1,8 +1,6 @@
 """app/services/test_services.py"""
 
-import json
-
-
+import json    
 
 def build_department_tree():
     tree = {}

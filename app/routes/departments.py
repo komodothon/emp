@@ -11,7 +11,7 @@ from app.services import get_parent_dept_choices
 
 departments_bp = Blueprint("departments", __name__, url_prefix="/departments")
 
-@departments_bp.route("/")
+@departments_bp.route("/", methods=["GET"])
 @login_required
 @role_required("SuperAdmin")
 def index():

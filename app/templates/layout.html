@@ -23,6 +23,8 @@
     <!-- chart.js -->
     <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
 
+   
+
     <script>
         setTimeout(function () {
             let alerts = document.querySelectorAll('.alert');
@@ -75,6 +77,8 @@
                             <li class="nav-item"><a class="nav-link text-white" href="{{ url_for('departments.index') }}">Manage Departments</a></li>
 
                             <li class="nav-item"><a class="nav-link text-white" href="{{ url_for('main.search_employee') }}">Search Employee</a></li>
+                            <li class="nav-item"><a class="nav-link text-white" href="{{ url_for('payroll.index') }}">Payroll Dashboard</a></li>
+
                         </ul>
                     </li>
                     <li class="nav-item mt-3">
@@ -129,8 +133,11 @@
     <script src="https://code.jquery.com/jquery-3.6.0.min.js"></script>
     <script src="https://cdn.jsdelivr.net/npm/jstree@3.3.12/dist/jstree.min.js"></script>
 
-      
-    {% block scripts %}{% endblock %}
+
+    {% block scripts %}
+    
+    
+    {% endblock %}
 
 </body>
 </html>

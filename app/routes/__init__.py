@@ -8,6 +8,7 @@ from .auth import auth_bp
 from .main import main_bp
 from .departments import departments_bp
 from .test import test_bp
+from .payroll_route import payroll_bp
 
 all_blueprints = [
     admin_bp,
@@ -15,4 +16,5 @@ all_blueprints = [
     main_bp,
     departments_bp,
     test_bp,
+    payroll_bp,
 ]

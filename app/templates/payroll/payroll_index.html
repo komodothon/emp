@@ -1,0 +1,290 @@
+{% extends "layout.html" %}
+
+{% block title %}
+    Payroll Dashboard
+{% endblock %}
+
+{% block content %}
+<div class="container mt-4">
+    <h2>Payroll Dashboard</h2>
+
+    <!-- Summary Cards -->
+    <div class="row mb-4">
+        <div class="col-md-3">
+            <div class="card text-bg-light">
+                <div class="card-body">
+                    <h6>Total Employees</h6>
+                    <h4>124</h4> <!-- You can fetch this dynamically -->
+                </div>
+            </div>
+        </div>
+        <div class="col-md-3">
+            <div class="card text-bg-light">
+                <div class="card-body">
+                    <h6>Departments Processed</h6>
+                    <h4>6</h4>
+                </div>
+            </div>
+        </div>
+        <div class="col-md-3">
+            <div class="card text-bg-light">
+                <div class="card-body">
+                    <h6>Last Payroll Run</h6>
+                    <h6>May 3, 2025</h6>
+                </div>
+            </div>
+        </div>
+        <div class="col-md-3">
+            <div class="card text-bg-light">
+                <div class="card-body">
+                    <h6>Pending Payrolls</h6>
+                    <h4>2</h4>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <!-- Main Row -->
+    <div class="row">
+        <!-- Left: Payroll Form -->
+        <div class="col-md-5">
+            <div class="card">
+                <div class="card-header">
+                    <h5 class="mb-0">Batch Payroll Processing</h5>
+                </div>
+                <div class="card-body">
+                    <form action="{{ url_for('payroll.index') }}" method="POST">
+                        {{ form.csrf_token }}
+
+                        <!-- Process Entire Organization -->
+                        <div class="form-check mb-3">
+                            {{ form.process_entire_org(class="form-check-input", id="process_entire_org") }}
+                            {{ form.process_entire_org.label(class="form-check-label") }}
+                        </div>
+
+                        <!-- Departments in Two Columns -->
+                        <div class="mb-3">
+                            <label class="form-label">{{ form.departments.label }}</label>
+                            {% set dept_fields = form.departments %}
+                            {% set dept_list = dept_fields | list %}
+                            {% set half = (dept_list | length) // 2 %}
+                        
+                            <div class="row">
+                                <div class="col-md-6">
+                                    {% for subfield in dept_list[:half] %}
+                                        <div class="form-check">
+                                            {{ subfield(class="form-check-input") }}
+                                            {{ subfield.label(class="form-check-label") }}
+                                        </div>
+                                    {% endfor %}
+                                </div>
+                                <div class="col-md-6">
+                                    {% for subfield in dept_list[half:] %}
+                                        <div class="form-check">
+                                            {{ subfield(class="form-check-input") }}
+                                            {{ subfield.label(class="form-check-label") }}
+                                        </div>
+                                    {% endfor %}
+                                </div>
+                            </div>
+                        </div>
+                        
+
+                        <!-- Salary Month -->
+                        <div class="mb-3">
+                            {{ form.salary_month.label(class="form-label") }}
+                            {{ form.salary_month(class="form-control") }}
+                        </div>
+                        
+                        <!-- View Payroll Button -->
+                        <button type="submit" class="btn btn-secondary me-2" name="action" value="view">
+                            View Payroll Records
+                        </button>
+                        <!-- Run Payroll Button -->
+                        <button type="submit" class="btn btn-primary" id="run-payroll-btn" name="action" value="run">
+                            Run Payroll
+                        </button>
+                        
+                    </form>
+                </div>
+            </div>
+        </div>
+
+        <!-- Right: Payroll History -->
+        <div class="col-md-7">
+            <div class="card">
+                <div class="card-header">
+                    <h5 class="mb-0">Payroll History</h5>
+                </div>
+                <div class="card-body">
+                    <table class="table table-bordered table-hover">
+                        <thead class="table-light">
+                            <tr>
+                                <th>Month</th>
+                                <th>Departments</th>
+                                <th>Date Processed</th>
+                                <th>Status</th>
+                                <th>Actions</th>
+                            </tr>
+                        </thead>
+                        <tbody>
+                            <!-- Example rows; populate dynamically -->
+                            <tr>
+                                <td>Apr 2025</td>
+                                <td>HR, IT</td>
+                                <td>May 3, 2025</td>
+                                <td><span class="badge bg-success">Success</span></td>
+                                <td><a href="#" class="btn btn-sm btn-outline-primary">View Payslips</a></td>
+                            </tr>
+                            <tr>
+                                <td>Mar 2025</td>
+                                <td>All</td>
+                                <td>Apr 2, 2025</td>
+                                <td><span class="badge bg-danger">Failed</span></td>
+                                <td><a href="#" class="btn btn-sm btn-outline-danger">Retry</a></td>
+                            </tr>
+                        </tbody>
+                    </table>
+                </div>
+            </div>
+
+            <!-- Payslip Search -->
+            <div class="card mt-4">
+                <div class="card-header">
+                    <h5 class="mb-0">Search Payslip</h5>
+                </div>
+                <div class="card-body">
+                    <form class="d-flex position-relative" action="{{ url_for('payroll.search_payslip') }}" method="GET" autocomplete="off">
+                        <input id="payslip-search" class="form-control me-2" type="text" placeholder="Employee ID or Name">
+                        <input id="employee-id-hidden" type="hidden" name="employee_id">
+                        <button class="btn btn-secondary" type="submit">Search</button>
+                        <div id="suggestion-box" class="dropdown-menu show w-100 mt-5 d-none" style="z-index: 1000;"></div>
+                    </form>
+                </div>
+            </div>
+
+        </div>
+    </div>
+</div>
+
+<!-- JS to check/uncheck department checkboxes -->
+<script>
+    const processEntireOrgCheckbox = document.getElementById('process_entire_org');
+    const departmentCheckboxes = document.querySelectorAll('input[name="departments"]');
+
+    processEntireOrgCheckbox.addEventListener('change', function() {
+        const isChecked = this.checked;
+        departmentCheckboxes.forEach(cb => cb.checked = isChecked);
+    });
+</script>
+
+<script>
+    // Enable/disable the run payroll button
+
+    document.addEventListener("DOMContentLoaded", function() {
+        console.log("Enable/disable payroll button -  function initiated..")
+
+        const processEntireOrgCheckbox = document.getElementById("process_entire_org")
+        const departmentCheckboxes = document.querySelectorAll('input[type="checkbox"][name^="departments"]');
+        const runPayrollButton = document.getElementById("run-payroll-btn");
+
+        processEntireOrgCheckbox.addEventListener("change", function() {
+            const isChecked = this.checked;
+            departmentCheckboxes.forEach(cb => cb.checked = isChecked)
+
+            togglePayrollButton();
+        });
+
+        function handleDepartmentCheckboxChange() {
+            const checkedCount = Array.from(departmentCheckboxes).filter(cb => cb.checked).length;
+            const totalCount = departmentCheckboxes.length;
+
+            runPayrollButton.disabled = (checkedCount === 0);
+            processEntireOrgCheckbox.checked = (checkedCount === totalCount);
+        }
+
+        // Add 'change' eventlistener to each checkbox
+        departmentCheckboxes.forEach(checkbox => {
+            checkbox.addEventListener("change", handleDepartmentCheckboxChange);
+        });
+
+        // Initial check (in case browser preserves state)
+        handleDepartmentCheckboxChange()
+
+        function togglePayrollButton() {
+            console.log("togglePayrollButton function initiated..")
+            const isAnyChecked = Array.from(departmentCheckboxes).some(checkbox => checkbox.checked) || processEntireOrgCheckbox.checked;
+            if (isAnyChecked) {
+                runPayrollButton.disabled = false;  // Enable the button
+            } else {
+                runPayrollButton.disabled = true;   // Disable the button
+            }
+            // runPayrollButton.disabled = !isAnyChecked
+        }
+
+    });
+</script>
+
+
+<!-- Script to dynamically load a list of employees for payslip search -->
+<script>
+    document.addEventListener('DOMContentLoaded', function () {
+        const input = document.getElementById('payslip-search');
+        const suggestionBox = document.getElementById('suggestion-box');
+        const hiddenInput = document.getElementById('employee-id-hidden');
+
+    
+        let debounceTimer;
+    
+        input.addEventListener('input', function () {
+            const query = input.value.trim();
+            clearTimeout(debounceTimer);
+    
+            if (!query) {
+                suggestionBox.classList.add('d-none');
+                return;
+            }
+    
+            debounceTimer = setTimeout(() => {
+                fetch(`/payroll/search_suggestions?q=${encodeURIComponent(query)}`)
+                    .then(res => res.json())
+                    .then(data => {
+                        suggestionBox.innerHTML = '';
+                        console.log("data: ", data);
+                        if (data.length === 0) {
+                            suggestionBox.classList.add('d-none');
+                            return;
+                        }
+    
+                        data.forEach(emp => {
+                            const item = document.createElement('div');
+                            item.classList.add('dropdown-item');
+                            item.style.cursor = 'pointer';
+                            item.innerHTML = `
+                                <strong>${emp.id}</strong> - ${emp.name}<br>
+                                <small>${emp.department} | ${emp.designation}</small>
+                            `;
+                            item.addEventListener('click', () => {
+                                input.value = `${emp.id} - ${emp.name} (${emp.department} | ${emp.designation})`;
+                                hiddenInput.value = emp.id;
+
+                                suggestionBox.classList.add('d-none');
+                            });
+                            suggestionBox.appendChild(item);
+                        });
+    
+                        suggestionBox.classList.remove('d-none');
+                    });
+            }, 300); // debounce delay
+        });
+    
+        // Hide suggestion box if clicked outside
+        document.addEventListener('click', function (e) {
+            if (!suggestionBox.contains(e.target) && e.target !== input) {
+                suggestionBox.classList.add('d-none');
+            }
+        });
+    });
+</script>
+    
+{% endblock %}

@@ -2,9 +2,9 @@
 
 from flask_login import UserMixin
 from datetime import datetime
+
 from extensions import db, bcrypt
 from .base import BaseModel
-from .admin_entities import Department, Role, Designation, ContractType, Status
 
 
 class User(UserMixin, BaseModel):
@@ -32,11 +32,24 @@ class User(UserMixin, BaseModel):
     # relationships
     credential = db.relationship("UserCredential", uselist=False, lazy="joined")
 
-    department = db.relationship(Department, backref="users", uselist=False)
-    role = db.relationship(Role, backref="users", uselist=False)
-    designation = db.relationship(Designation, backref="users", uselist=False)
-    contract_type = db.relationship(ContractType, backref="users", uselist=False)
-    status = db.relationship(Status, backref="users", uselist=False)
+    department = db.relationship("Department", backref="users", uselist=False)
+    role = db.relationship("Role", backref="users", uselist=False)
+    designation = db.relationship("Designation", backref="users", uselist=False)
+    contract_type = db.relationship("ContractType", backref="users", uselist=False)
+    status = db.relationship("Status", backref="users", uselist=False)
+
+    # payroll relationships
+    payroll_records = db.relationship(
+        "PayrollRecord", 
+        back_populates="employee", 
+        cascade="all, delete-orphan"
+    )
+    salary_structure = db.relationship(
+        "SalaryStructure", 
+        back_populates="employee", 
+        cascade="all, delete-orphan", 
+        uselist=False
+    )
 
     def __repr__(self):
         return f"<User {self.first_name} {self.last_name} - {self.department} - {self.role}>"
@@ -48,6 +61,9 @@ class User(UserMixin, BaseModel):
     def check_password(self, plain_password):
         return bcrypt.check_password_hash(self.credential.password_hash, plain_password)
 
+    @property
+    def status_name(self):
+        return self.status.name if self.status else None
 
 class UserCredential(BaseModel):
     __tablename__ = 'user_credentials'

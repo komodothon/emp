@@ -1,0 +1,135 @@
+{% extends "layout.html" %}
+
+{% block title %} Payroll Records {% endblock %}
+
+{% block content %}
+    <h3 class="mb-4">Payroll Records</h3>
+
+    <div class="row">
+
+        <!-- Left Column: Payroll Table -->
+        <div class="col-md-6">
+            <div class="mb-3">
+                <label for="monthFilter" class="form-label">Filter by Month:</label>
+                <input type="month" id="monthFilter" class="form-control" />
+            </div>
+
+            <table class="table table-bordered table-hover" id="payrollTable">
+                <thead>
+                    <tr>
+                        <th>Name</th>
+                        <th>Salary Month</th>
+                        <th>Gross</th>
+                        <th>Net</th>
+                    </tr>
+                </thead>
+                <tbody>
+                    {% for record in payroll_records %}
+                    <tr class="payroll-row" data-id="{{ record[0] }}"
+                        data-name="{{ record[1] }} {{ record[2] }}"
+                        data-month="{{ record[3] }}"
+                        data-gross="{{ record[4] }}"
+                        data-net="{{ record[5] }}">
+                        <td>{{ record[1] }} {{ record[2] }}</td>
+                        <td>{{ record[3] }}</td>
+                        <td>${{ "{:,.2f}".format(record[4]) }}</td>
+                        <td>${{ "{:,.2f}".format(record[5]) }}</td>
+                    </tr>
+                    {% endfor %}
+                </tbody>
+            </table>
+        </div>
+
+        <!-- Right Column: Payslip -->
+        <div class="col-md-6">
+            <div class="card" id="payslipCard">
+                <div class="card-header d-flex justify-content-between align-items-center">
+                    <strong>Payslip</strong>
+                    <a id="pdfLink" href="#" target="_blank" class="btn btn-sm btn-primary">Download PDF</a>
+                </div>
+                <div class="card-body" id="payslipBody">
+                    {% if payroll_records %}
+                    {% set latest = payroll_records[-1] %}
+                    <div id="payslipContent">
+                        <div class="text-center mb-3">
+                            <img src="/static/images/company_logo.jpg" alt="Company Logo" width="80">
+                            <h5 class="mt-2 mb-0">ACME Corporation Pvt. Ltd.</h5>
+                            <p class="mb-1"><small>123 Corporate Lane, Tech City, India</small></p>
+                            <hr>
+                        </div>
+                        <p><strong>Name:</strong> {{ latest[1] }} {{ latest[2] }}</p>
+                        <p><strong>Salary Month:</strong> {{ latest[3] }}</p>
+                        <p><strong>Gross Salary:</strong> ${{ "{:,.2f}".format(latest[4]) }}</p>
+                        <p><strong>Net Salary:</strong> ${{ "{:,.2f}".format(latest[5]) }}</p>
+                    </div>
+                    {% else %}
+                    <p>No records available.</p>
+                    {% endif %}
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <!-- payslip info on right side  -->
+    <script>
+        const rows = document.querySelectorAll(".payroll-row");
+        const payslipBody = document.getElementById("payslipBody");
+        const pdfLink = document.getElementById("pdfLink");
+
+        rows.forEach(row => {
+            row.addEventListener("click", () => {
+                const name = row.dataset.name;
+                const month = row.dataset.month;
+                const gross = parseFloat(row.dataset.gross).toFixed(2);
+                const net = parseFloat(row.dataset.net).toFixed(2);
+                const id = row.dataset.id;
+
+                payslipBody.innerHTML = `
+                    <div id="payslipContent">
+                        <div class="text-center mb-3">
+                            <img src="/static/images/company_logo.jpg" alt="Company Logo" width="80">
+                            <h5 class="mt-2 mb-0">ACME Corporation Pvt. Ltd.</h5>
+                            <p class="mb-1"><small>123 Corporate Lane, Tech City, India</small></p>
+                            <hr>
+                        </div>
+                        <p><strong>Name:</strong> ${name}</p>
+                        <p><strong>Salary Month:</strong> ${month}</p>
+                        <p><strong>Gross Salary:</strong> ₹${gross}</p>
+                        <p><strong>Net Salary:</strong> ₹${net}</p>
+                    </div>
+                `;
+
+                pdfLink.href = `/payroll/payslip_pdf/${id}/${month}`;
+            });
+        });
+    </script>
+
+
+    <script>
+        const monthInput = document.getElementById("monthFilter");
+        const tableRows = document.querySelectorAll(".payroll-row");
+
+        monthInput.addEventListener("input", () => {
+            const selectedMonth = monthInput.value;  // format: "2025-05"
+
+            tableRows.forEach(row => {
+                const rowMonth = row.dataset.month;  // must also be in "YYYY-MM" format
+                if (!selectedMonth || rowMonth === selectedMonth) {
+                    row.style.display = "";
+                } else {
+                    row.style.display = "none";
+                }
+            });
+
+            // Optional: update payslip to latest visible record
+            const visibleRows = Array.from(tableRows).filter(row => row.style.display !== "none");
+            if (visibleRows.length > 0) {
+                visibleRows[visibleRows.length - 1].click();
+            } else {
+                payslipBody.innerHTML = "<p>No records available.</p>";
+            }
+        });
+    </script>
+
+
+{% endblock %}

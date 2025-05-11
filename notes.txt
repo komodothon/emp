@@ -1,0 +1,30 @@
+                            
+                            <!-- Month Selection Dropdown -->
+                            <div class="mb-3">
+                                <label for="month" class="form-label">Select Month</label>
+                                <select class="form-select" id="month" name="month" required>
+                                    <option value="" disabled selected>Select a month</option>
+                                    {% set months = ["January", "February", "March", "April", "May", "June", "July", "August", "September", "October", "November", "December"] %}
+                                    {% set current_month = today|date("m")|int %}
+                                    {% for i, month in enumerate(months) %}
+                                        <option value="{{ month }}" 
+                                        {% if i+1 > current_month %} 
+                                            disabled 
+                                        {% endif %}>{{ month }}</option>
+                                    {% endfor %}
+                                </select>
+                            </div>
+
+
+
+<script>
+// Using jQuery and jQuery UI Datepicker (make sure to include these libraries)
+$(document).ready(function() {
+    $("#monthPicker").datepicker({
+        format: "mm/yyyy",
+        viewMode: "months", 
+        minViewMode: "months",
+        autoclose: true
+    });
+});
+</script>
