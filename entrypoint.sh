@@ -14,6 +14,11 @@ if [ "$FLASK_ENV" = "development" ]; then
     export PYTHONPATH=/code
     python seed/setup_admin_db.py
     python seed/setup_db.py
+    python seed/mod_contr_end_date.py
+    python seed/seed_salary_structure.py
+    python seed/seed_payroll_records.py
+
+
     echo "[✅] Seeding complete."
   else
     echo "✅ dev.db already exists. Skipping seeding."
