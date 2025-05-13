@@ -32,6 +32,12 @@ The **Employee Management System** is a comprehensive web application designed t
 ### 6. **Database Migrations**
    - Utilize Flask-Migrate to handle database schema
 
+### 7. Payroll Module
+   - Manage employee payroll records, including salaries, bonuses, deductions, and tax information.
+   - Generate payslips based on the employee’s salary structure, contract type, and any other applicable deductions.
+   - Calculate and update employee compensation automatically according to their position and contractual details.
+   - Integrates the payroll records with the employee management system to ensure smooth payroll processing for each employee.
+
 ### 8. Responsive Design
    - The app is built with Bootstrap to ensure it is fully responsive and works well across desktops, tablets, and mobile devices.
    - Integrates JavaScript with AJAX to dynamically update UI based on real-time backend responses without full page reloads.
