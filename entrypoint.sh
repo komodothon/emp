@@ -18,7 +18,6 @@ if [ "$FLASK_ENV" = "development" ]; then
     python seed/seed_salary_structure.py
     python seed/seed_payroll_records.py
 
-
     echo "[✅] Seeding complete."
   else
     echo "✅ dev.db already exists. Skipping seeding."

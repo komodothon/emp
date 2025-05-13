@@ -20,12 +20,10 @@ jobs:
 
     - name: 📦 Deploy to OCI VM
       run: |
-        ssh -o StrictHostKeyChecking=no ubuntu@68.233.109.71 << 'EOF'
-          cd ~/emp-deploy || git clone https://github.com/komodothon/emp.git emp-deploy && cd emp-deploy
+        ssh -o StrictHostKeyChecking=no ${{ secrets.VM_USER }}@${{ secrets.VM_HOST }} << 'EOF'
+          cd /home/ubuntu/emp
           git pull origin main
-          docker rm -f flask-app || true
-          docker build -t emp-app .
-          docker run -d -p 8000:8000 --restart always --name flask-app \
-            -v /home/ubuntu/emp/instance:/code/instance \
-            emp-app
+          docker stop flask_app || true && docker rm flask_app || true
+          docker build -t flask_app .
+          docker run -d -p 8000:8000 --name flask_app flask_app
         EOF
