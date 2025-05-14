@@ -31,6 +31,7 @@ def login():
     if form.validate_on_submit():
         username = form.username.data
         user_cred = form.password.data
+        print(f"[login]: username: {username}")
 
         if not username and not user_cred:
             flash("Username and password required", "warning")
@@ -40,6 +41,7 @@ def login():
             user = User.query.filter_by(username=username).first()
 
             if user and user.check_password(user_cred):
+                print(f"[login] user found: {user}")
                 login_user(user)
                 
                 flash(f"Logged in as {user.username}", "success")
@@ -53,6 +55,7 @@ def login():
 
             else:
                 flash("Invalid username or password", "danger")
+                print(f"[login]: Invalid username or password")
 
         except Exception as e:
             print(f"[Login error]: {e}")

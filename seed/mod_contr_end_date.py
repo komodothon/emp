@@ -13,6 +13,7 @@ from datetime import date, timedelta
 def main():
 
     app = create_app()
+    # db.create_all()
     with app.app_context():
         contract = ContractType.query.filter_by(name='Contract').first()
         internship = ContractType.query.filter_by(name='Internship').first()

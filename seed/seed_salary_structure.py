@@ -77,6 +77,7 @@ def seed_salary_structure():
 
 def main():
     app = create_app()
+    # db.create_all()
     with app.app_context():
         seed_salary_structure()
 
