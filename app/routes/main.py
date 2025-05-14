@@ -1,7 +1,7 @@
 """routes/main.py"""
 
-from flask import Blueprint, render_template, redirect, request, url_for, flash, jsonify, current_user
-from flask_login import login_required
+from flask import Blueprint, render_template, redirect, request, url_for, flash, jsonify
+from flask_login import login_required, current_user
 from extensions import db, bcrypt
 from app.models import User,Department, Role, Designation, ContractType, Status
 from app.forms import EmployeeForm
