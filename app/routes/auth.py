@@ -29,40 +29,39 @@ def login():
 
     if request.method == "POST":
         print(f"[login] request.method = post")
-        if form.validate_on_submit():
-            username = form.username.data
-            user_cred = form.password.data
-            print(f"[login]: username: {username}")
 
-            if not username and not user_cred:
-                flash("Username and password required", "warning")
-                return render_template("login.html", form=form)
-            
-            try:
-                user = User.query.filter_by(username=username).first()
+        username = form.username.data
+        user_cred = form.password.data
+        print(f"[login]: username: {username}")
 
-                if user and user.check_password(user_cred):
-                    print(f"[login] user found: {user}")
-                    login_user(user)
-                    
-                    flash(f"Logged in as {user.username}", "success")
+        if not username and not user_cred:
+            flash("Username and password required", "warning")
+            return render_template("login.html", form=form)
+        
+        try:
+            user = User.query.filter_by(username=username).first()
 
-                    next_page = request.args.get("next")
+            if user and user.check_password(user_cred):
+                print(f"[login] user found: {user}")
+                login_user(user)
+                
+                flash(f"Logged in as {user.username}", "success")
 
-                    if not next_page or urlparse(next_page).netloc != "":
-                        next_page = url_for("main.dashboard")
+                next_page = request.args.get("next")
 
-                    return redirect(next_page)
+                if not next_page or urlparse(next_page).netloc != "":
+                    next_page = url_for("main.dashboard")
 
-                else:
-                    flash("Invalid username or password", "danger")
-                    print(f"[login]: Invalid username or password")
+                return redirect(next_page)
 
-            except Exception as e:
-                print(f"[Login error]: {e}")
-                flash("An error occurred. Please try again.", "danger")
-        else:
-            print(f"[login]: form validation failed")
+            else:
+                flash("Invalid username or password", "danger")
+                print(f"[login]: Invalid username or password")
+
+        except Exception as e:
+            print(f"[Login error]: {e}")
+            flash("An error occurred. Please try again.", "danger")
+
     return render_template("login.html", form=form)
 
 
