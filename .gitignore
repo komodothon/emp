@@ -59,9 +59,6 @@ dist/
 # Node modules (if using any JS tooling)
 node_modules/
 
-# test files
-test.py
-
 *.tar
 *.tar.gz
 *.zip
