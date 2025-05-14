@@ -16,10 +16,11 @@ fi
 
 # Run database migrations (safe for dev and prod)
 echo "📦 Running database migrations..."
+flask db migrate -m "Initial migration(auto)" || true #Optional: skip if no change
 flask db upgrade
-echo "[✅] Migrations applied successfully."
+echo "[✅] Tables created successfully."
 
-# In development, create and seed dev.db only if it doesn't exist
+# In development, seed database
 if [ "$FLASK_ENV" = "development" ]; then
   echo "Seeding development database..."
   export PYTHONPATH=/code
