@@ -1,6 +1,6 @@
 """app/routes/auth.py"""
 
-from flask import Blueprint, render_template, request, redirect, url_for, flash
+from flask import Blueprint, render_template, request, redirect, url_for, flash, session
 from flask_login import login_user, logout_user, login_required, current_user
 from urllib.parse  import urlparse
 
@@ -22,6 +22,7 @@ def load_user(user_id):
 def login():        
     form = LoginForm()
     print("[DEBUG] login() route hit")
+    print("[DEBUG] session before login:", dict(session))
     
     # Check if the user is already logged in
     if current_user.is_authenticated:
@@ -29,6 +30,7 @@ def login():
 
     if request.method == "POST":
         print(f"[login] request.method = post")
+        print("[DEBUG] session after login:", dict(session))
 
         username = form.username.data
         user_cred = form.password.data
