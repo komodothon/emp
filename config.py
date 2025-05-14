@@ -14,7 +14,7 @@ class Config:
     SECRET_KEY = "a_very_secret_and_long_dev_key_123456789"
     SQLALCHEMY_TRACK_MODIFICATIONS = False
     BCRYPT_LOG_ROUNDS = 12
-    SESSION_COOKIE_SECURE = True
+    SESSION_COOKIE_SECURE = False
 
 
 class DevConfig(Config):
