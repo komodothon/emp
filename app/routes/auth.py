@@ -48,9 +48,11 @@ def login():
                 flash(f"Logged in as {user.username}", "success")
 
                 next_page = request.args.get("next")
+                print(f"[login]: next_page: {next_page}")
 
                 if not next_page or urlparse(next_page).netloc != "":
                     next_page = url_for("main.dashboard")
+                    print(f"[login]: next_page: {next_page}")
 
                 return redirect(next_page)
 
