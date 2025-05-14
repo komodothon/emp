@@ -1,6 +1,6 @@
 """routes/main.py"""
 
-from flask import Blueprint, render_template, redirect, request, url_for, flash, jsonify
+from flask import Blueprint, render_template, redirect, request, url_for, flash, jsonify, current_user
 from flask_login import login_required
 from extensions import db, bcrypt
 from app.models import User,Department, Role, Designation, ContractType, Status
@@ -12,6 +12,9 @@ main_bp = Blueprint("main", __name__)
 @main_bp.route("/dashboard")
 @login_required
 def dashboard():
+    print("[main dashboard] route hit")
+    print(f"[main dashboard] current_user = {current_user}")
+
 
     try:
         users = User.query.all()

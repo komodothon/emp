@@ -54,6 +54,9 @@ def login():
                     next_page = url_for("main.dashboard")
                     print(f"[login]: next_page: {next_page}")
 
+                print(f"[login] redirecting to {next_page}")
+                print(f"[login] current_user.is_authenticated = {current_user.is_authenticated}")
+
                 return redirect(next_page)
 
             else:
